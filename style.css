@@ -2,10 +2,14 @@
 #output-list {
     list-style-type: none;
     padding: 0;
-  }
+}
   #output-list li {
     margin-bottom: 5px;
     padding: 10px;
     background-color: #f0f0f0;
     border: 1px solid #ccc;
-  }
+}
+
+body {
+    background-color: blue;
+}
