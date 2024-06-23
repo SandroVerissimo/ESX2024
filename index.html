@@ -1,43 +1,16 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Exibir Câmera</title>
-    <style>
-        body {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-            background-color: #f0f0f0;
-        }
-        video {
-            border: 2px solid #333;
-            border-radius: 8px;
-            transform: scaleX(-1); /* Inverte a imagem horizontalmente */
-        }
-    </style>
+    <title>Câmera Traseira</title>
 </head>
 <body>
+    <h1>Câmera Traseira</h1>
     <video id="video" width="640" height="480" autoplay></video>
-    <script>
-        async function startCamera() {
-            const video = document.getElementById('video');
-            try {
-                const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-                video.srcObject = stream;
-            } catch (err) {
-                console.error('Erro ao acessar a câmera: ', err);
-                alert('Erro ao acessar a câmera: ' + err.message);
-            }
-        }
-
-        // Inicia a câmera assim que a página carrega
-        window.addEventListener('load', startCamera);
-    </script>
+    <script src="script.js"></script>
 </body>
 </html>
+
 
 
