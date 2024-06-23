@@ -62,12 +62,13 @@
       });
     }
 
-    // Inicializa o scanner com a primeira câmera encontrada
+    // Inicializa o scanner com a câmera traseira
     Instascan.Camera.getCameras().then(function (cameras) {
-      if (cameras.length > 0) {
-        scanner.start(cameras[0]);
+      let backCamera = cameras.find(camera => camera.name.toLowerCase().includes('back'));
+      if (backCamera) {
+        scanner.start(backCamera);
       } else {
-        console.error('Nenhuma câmera encontrada.');
+        console.error('Câmera traseira não encontrada.');
       }
     }).catch(function (e) {
       console.error(e);
@@ -75,5 +76,6 @@
   </script>
 </body>
 </html>
+
 
 
