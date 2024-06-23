@@ -1,20 +1,30 @@
 <!DOCTYPE html>
-<html lang="pt">
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Leitor QR Code</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>QR Code Scanner</title>
+<style>
+    #qr-video {
+        width: 100%;
+        max-width: 600px;
+        margin: auto;
+    }
+    #qr-canvas {
+        display: none;
+    }
+</style>
 </head>
 <body>
-    <h1>Leitor QR Code</h1>
-    <video id="video" width="640" height="480" autoplay></video>
-    <canvas id="canvas" style="display: none;"></canvas>
-    <div id="resultado"></div>
-    <ul id="listaQRCodes"></ul>
-    <script src="https://cdn.jsdelivr.net/npm/jsqr@2.0.1/build/jsQR.js"></script>
-    <script src="script.js"></script>
+    <h1>QR Code Scanner</h1>
+    <video id="qr-video" playsinline autoplay></video>
+    <canvas id="qr-canvas"></canvas>
+
+    <script src="https://cdn.jsdelivr.net/npm/jsQR@1.0.1/dist/jsQR.min.js"></script>
+    <script src="qrscanner.js"></script>
 </body>
 </html>
+
 
 
 
