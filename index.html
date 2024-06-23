@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QR Code Scanner</title>
+</head>
+<body>
+    <h1>Leitor de QR Code</h1>
+    <div id="qr-reader" style="width: 500px;"></div>
+    <div id="qr-reader-results"></div>
+
+    <script src="https://unpkg.com/html5-qrcode/minified/html5-qrcode.min.js"></script>
+    <script>
+        const listaDadosQR = new Set();
+
+        function onScanSuccess(decodedText, decodedResult) {
+            // Se o QR code ainda não estiver na lista, adiciona
+            if (!listaDadosQR.has(decodedText)) {
+                listaDadosQR.add(decodedText);
+                const resultDiv = document.getElementById('qr-reader-results');
+                const newEntry = document.createElement('div');
+                newEntry.textContent = `QR Code lido: ${decodedText}`;
+                resultDiv.appendChild(newEntry);
+            }
+        }
+
+        function onScanFailure(error) {
+            // Pode logar o erro se quiser
+            console.warn(`Erro na leitura do QR Code: ${error}`);
+        }
+
+        // Inicializa o leitor de QR Code
+        const html5QrCode = new Html5Qrcode("qr-reader");
+
+        // Inicia a câmera para ler o QR Code
+        html5QrCode.start(
+            { facingMode: "environment" }, // Use câmera traseira
+            {
+                fps: 10,    // Frames por segundo
+                qrbox: { width: 250, height: 250 }  // Tamanho da caixa de leitura
+            },
+            onScanSuccess,
+            onScanFailure
+        ).catch(err => {
+            console.error(`Erro ao iniciar a câmera: ${err}`);
+        });
+    </script>
+</body>
+</html>
