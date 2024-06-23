@@ -24,7 +24,7 @@ function tick() {
         canvas.drawImage(video, 0, 0, canvasElement.width, canvasElement.height);
         const imageData = canvas.getImageData(0, 0, canvasElement.width, canvasElement.height);
         const code = jsQR(imageData.data, imageData.width, imageData.height, {
-            inversionAttempts: 'dontInvert',
+            inversionAttempts: 'attemptBoth',
         });
         if (code) {
             console.log('Found QR code: ', code.data);
@@ -33,3 +33,4 @@ function tick() {
     }
     requestAnimationFrame(tick);
 }
+
