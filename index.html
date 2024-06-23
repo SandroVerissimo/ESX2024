@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Leitor de QR Code com Inversão de Câmera</title>
+  <style>
+    #video-container {
+      display: flex;
+      justify-content: center;
+      margin-top: 20px;
+    }
+    #qr-result {
+      margin-top: 20px;
+      padding: 10px;
+      border: 1px solid #ccc;
+      max-width: 500px;
+      word-wrap: break-word;
+    }
+  </style>
+</head>
+<body>
+  <h1>Leitor de QR Code com Inversão de Câmera</h1>
+  <div id="qr-result"></div>
+  <div id="video-container">
+    <video id="qr-video" width="300" height="300" autoplay></video>
+    <button onclick="toggleCamera()">Inverter Câmera</button>
+  </div>
+
+  <script>
+    const video = document.getElementById('qr-video');
+    const qrResult = document.getElementById('qr-result');
+    let currentFacingMode = 'environment'; // 'environment' para câmera traseira
+
+    // Função para inicializar o leitor de QR code
+    function initQrCodeReader() {
+      const constraints = {
+        video: {
+          facingMode: { exact: currentFacingMode } // Inicialmente câmera traseira
+        }
+      };
+
+      navigator.mediaDevices.getUserMedia(constraints)
+        .then(function(stream) {
+          video.srcObject = stream;
+          video.play();
+          requestAnimationFrame(tick);
+        })
+        .catch(function(err) {
+          console.error('Erro ao acessar a câmera: ', err);
+        });
+    }
+
+    // Função para trocar entre câmera frontal e traseira
+    function toggleCamera() {
+      if (currentFacingMode === 'user') {
+        currentFacingMode = 'environment'; // Trocar para câmera traseira
+      } else {
+        currentFacingMode = 'user'; // Trocar para câmera frontal
+      }
+
+      // Reinicializar o leitor de QR code com a nova câmera selecionada
+      const constraints = {
+        video: {
+          facingMode: { exact: currentFacingMode }
+        }
+      };
+
+      navigator.mediaDevices.getUserMedia(constraints)
+        .then(function(stream) {
+          video.srcObject = stream;
+          video.play();
+          requestAnimationFrame(tick);
+        })
+        .catch(function(err) {
+          console.error('Erro ao trocar de câmera: ', err);
+        });
+    }
+
+    // Função para processar os frames do vídeo
+    function tick() {
+      if (video.readyState === video.HAVE_ENOUGH_DATA) {
+        const canvasElement = document.createElement('canvas');
+        canvasElement.width = video.videoWidth;
+        canvasElement.height = video.videoHeight;
+        const canvas = canvasElement.getContext('2d');
+        canvas.drawImage(video, 0, 0, canvasElement.width, canvasElement.height);
+        const imageData = canvas.getImageData(0, 0, canvasElement.width, canvasElement.height);
+        const code = jsQR(imageData.data, imageData.width, imageData.height, {
+          inversionAttempts: 'dontInvert',
+        });
+        if (code) {
+          qrResult.textContent = 'QR Code encontrado: ' + code.data;
+        }
+        requestAnimationFrame(tick);
+      }
+    }
+
+    // Inicializar o leitor quando a janela carregar
+    window.addEventListener('load', initQrCodeReader);
+  </script>
+</body>
+</html>
