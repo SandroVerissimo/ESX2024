@@ -1,36 +1,65 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Scanner de QR Code</title>
-  <style>
-    /* Estilos simples para a lista de QR codes */
-    #output-list {
-      list-style-type: none;
-      padding: 0;
-    }
-    #output-list li {
-      margin-bottom: 5px;
-      padding: 10px;
-      background-color: #f0f0f0;
-      border: 1px solid #ccc;
-    }
-  </style>
+  <link rel="stylesheet" href="style.css">
   <script src="https://rawgit.com/schmich/instascan-builds/master/instascan.min.js"></script>
 </head>
 <body>
   <h1>Leitor de QR Code</h1>
-  <video id="preview" playsinline autoplay></video>
-  <ul id="output-list"></ul> <!-- Lista para exibir os QR codes lidos -->
+  <video id="preview"></video>
+  <div id="output"></div>
 
   <script>
+    // Inicializa o scanner com opções personalizadas
     let scanner = new Instascan.Scanner({ 
       video: document.getElementById('preview'),
-      mirror: false // Não espelha o vídeo (opcional)
+      mirror: false // Espelha o vídeo (opcional)
     });
 
-    let qrCodes = []; // Array para armazenar os QR codes lidos
+    // Função para selecionar a câmera traseira
+    function useBackCamera() {
+      Instascan.Camera.getCameras().then(function (cameras) {
+        let backCamera = cameras.find(camera => camera.name.toLowerCase().includes('back'));
+        if (backCamera) {
+          scanner.stop(); // Para o scanner
+          scanner.start(backCamera); // Inicia o scanner com a câmera traseira
+        } else {
+          console.error('Câmera traseira não encontrada.');
+        }
+      }).catch(function (e) {
+        console.error(e);
+      });
+    }
+
+    // Adiciona um ouvinte de evento para selecionar a câmera traseira (opcional)
+    document.addEventListener('keydown', function (event) {
+      if (event.key === 'b' || event.key === 'B') {
+        useBackCamera();
+      }
+    });
+
+    // Adiciona um ouvinte de evento para processar o QR code lido
+    scanner.addListener('scan', function (content) {
+      document.getElementById('output').textContent = content;
+      // Aqui você pode fazer algo com o conteúdo lido do QR code
+    });
+
+    // Inicializa o scanner com a câmera traseira
+    Instascan.Camera.getCameras().then(function (cameras) {
+      let backCamera = cameras.find(camera => camera.name.toLowerCase().includes('back'));
+      if (backCamera) {
+        scanner.start(backCamera);
+      } else {
+        console.error('Câmera traseira não encontrada.');
+      }
+    }).catch(function (e) {
+      console.error(e);
+    });
+
+	let qrCodes = []; // Array para armazenar os QR codes lidos
 
     // Adiciona um ouvinte de evento para processar o QR code lido
     scanner.addListener('scan', function (content) {
@@ -53,18 +82,7 @@
       });
     }
 
-    // Inicializa o scanner com a primeira câmera encontrada
-    Instascan.Camera.getCameras().then(function (cameras) {
-      if (cameras.length > 0) {
-        scanner.start(cameras[0]);
-      } else {
-        console.error('Nenhuma câmera encontrada.');
-      }
-    }).catch(function (e) {
-      console.error(e);
-    });
   </script>
 </body>
 </html>
-
 
