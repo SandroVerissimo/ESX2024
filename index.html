@@ -1,37 +1,112 @@
-// Função para gerar imagens PNG dos QR codes lidos
-function generateQrCodeImages() {
-  qrCodes.forEach(function(qrCode, index) {
-    // Cria um elemento <canvas> temporário para renderizar o QR code
-    let canvas = document.createElement('canvas');
-    let context = canvas.getContext('2d');
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Scanner de QR Code</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    /* Estilos simples para a lista de QR codes */
+    #output-list {
+      list-style-type: none;
+      padding: 0;
+    }
+    #output-list li {
+      margin-bottom: 5px;
+      padding: 10px;
+      background-color: #f0f0f0;
+      border: 1px solid #ccc;
+    }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/qrious/dist/qrious.min.js"></script>
+  <script src="https://rawgit.com/schmich/instascan-builds/master/instascan.min.js"></script>
+</head>
+<body>
+  <h1>Leitor de QR Code</h1>
+  <video id="preview" playsinline autoplay></video>
+  <ul id="output-list"></ul> <!-- Lista para exibir os QR codes lidos -->
+  <button onclick="generateQrCodeImages()">Gerar Lista PNG</button> <!-- Botão para gerar lista PNG -->
 
-    // Configura o tamanho do canvas
-    canvas.width = 200; // Largura
-    canvas.height = 200; // Altura
-
-    // Cria um objeto QRious com o conteúdo do QR code atual
-    let qr = new QRious({
-      element: canvas,
-      value: qrCode,
-      size: 200 // Tamanho do QR code
+  <script>
+    // Cria um objeto Scanner Instascan com a configuração do vídeo e sem espelhamento
+    let scanner = new Instascan.Scanner({ 
+      video: document.getElementById('preview'),
+      mirror: false // Não espelha o vídeo (opcional)
     });
 
-    // Cria um link de download para o PNG do QR code
-    let link = document.createElement('a');
-    link.href = canvas.toDataURL('image/png'); // Converte o canvas para data URL PNG
-    link.download = `qr_code_${index + 1}.png`; // Nome do arquivo para download
-    link.textContent = `QR Code ${index + 1}`; // Texto do link
+    let qrCodes = []; // Array para armazenar os QR codes lidos
 
-    // Cria um parágrafo <p> para exibir o conteúdo do QR code
-    let paragraph = document.createElement('p');
-    paragraph.textContent = `Conteúdo do QR Code ${index + 1}: ${qrCode}`;
+    // Adiciona um ouvinte de evento para processar o QR code lido
+    scanner.addListener('scan', function (content) {
+      // Verifica se o QR code já foi lido antes de adicioná-lo
+      if (!qrCodes.includes(content)) {
+        qrCodes.push(content); // Adiciona o QR code lido ao array
+        updateQrCodeList(); // Atualiza a lista na página
+      }
+    });
 
-    // Adiciona a imagem e o parágrafo à página
-    document.body.appendChild(link);
-    document.body.appendChild(paragraph);
-    document.body.appendChild(document.createElement('br')); // Quebra de linha para separar os elementos
-  });
-}
+    // Função para atualizar a lista de QR codes na página
+    function updateQrCodeList() {
+      let outputList = document.getElementById('output-list');
+      outputList.innerHTML = ''; // Limpa a lista atual
+
+      // Itera sobre o array de QR codes e cria itens de lista para cada um
+      qrCodes.forEach(function (qrCode) {
+        let listItem = document.createElement('li');
+        listItem.textContent = qrCode;
+        outputList.appendChild(listItem);
+      });
+    }
+
+    // Função para gerar imagens PNG dos QR codes lidos
+    function generateQrCodeImages() {
+      qrCodes.forEach(function(qrCode, index) {
+        // Cria um elemento <canvas> temporário para renderizar o QR code
+        let canvas = document.createElement('canvas');
+        let context = canvas.getContext('2d');
+  
+        // Configura o tamanho do canvas
+        canvas.width = 200; // Largura
+        canvas.height = 200; // Altura
+  
+        // Cria um objeto QRious com o conteúdo do QR code atual
+        let qr = new QRious({
+          element: canvas,
+          value: qrCode,
+          size: 200 // Tamanho do QR code
+        });
+  
+        // Cria um link de download para o PNG do QR code
+        let link = document.createElement('a');
+        link.href = canvas.toDataURL('image/png'); // Converte o canvas para data URL PNG
+        link.download = `qr_code_${index + 1}.png`; // Nome do arquivo para download
+        link.textContent = `QR Code ${index + 1}`; // Texto do link
+  
+        // Cria um parágrafo <p> para exibir o conteúdo do QR code
+        let paragraph = document.createElement('p');
+        paragraph.textContent = `Conteúdo do QR Code ${index + 1}: ${qrCode}`;
+  
+        // Adiciona a imagem, o parágrafo e uma quebra de linha à página
+        document.body.appendChild(link);
+        document.body.appendChild(paragraph);
+        document.body.appendChild(document.createElement('br')); // Quebra de linha para separar os elementos
+      });
+    }
+
+    // Inicializa o scanner com a câmera traseira
+    Instascan.Camera.getCameras().then(function (cameras) {
+      let backCamera = cameras.find(camera => camera.name.toLowerCase().includes('back'));
+      if (backCamera) {
+        scanner.start(backCamera);
+      } else {
+        console.error('Câmera traseira não encontrada.');
+      }
+    }).catch(function (e) {
+      console.error(e);
+    });
+  </script>
+</body>
+</html>
 
 
 
