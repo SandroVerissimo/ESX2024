@@ -12,16 +12,48 @@
   <div id="output"></div>
 
   <script>
-    let scanner = new Instascan.Scanner({ video: document.getElementById('preview'), mirror: false });
+    // Inicializa o scanner com opções personalizadas
+    let scanner = new Instascan.Scanner({ 
+      video: document.getElementById('preview'),
+      mirror: true // Espelha o vídeo
+    });
+
+    // Função para trocar entre as câmeras disponíveis
+    function switchCamera() {
+      Instascan.Camera.getCameras().then(function (cameras) {
+        if (cameras.length > 1) {
+          let currentCamera = scanner.camera; // Salva a câmera atual
+          let nextCameraIndex = cameras.findIndex(camera => camera.id !== currentCamera.id); // Encontra a próxima câmera disponível
+          let nextCamera = cameras[nextCameraIndex];
+          scanner.stop(); // Para o scanner
+          scanner.start(nextCamera); // Inicia o scanner com a próxima câmera
+        } else {
+          console.error('Não há outras câmeras disponíveis.');
+        }
+      }).catch(function (e) {
+        console.error(e);
+      });
+    }
+
+    // Adiciona um ouvinte de evento para a troca de câmeras (opcional)
+    document.addEventListener('keydown', function (event) {
+      if (event.key === 'c' || event.key === 'C') {
+        switchCamera();
+      }
+    });
+
+    // Adiciona um ouvinte de evento para processar o QR code lido
     scanner.addListener('scan', function (content) {
       document.getElementById('output').textContent = content;
-      // Aqui você pode fazer algo com o conteúdo lido, como redirecionar para um URL, etc.
+      // Aqui você pode fazer algo com o conteúdo lido do QR code
     });
+
+    // Inicializa o scanner com a primeira câmera encontrada
     Instascan.Camera.getCameras().then(function (cameras) {
       if (cameras.length > 0) {
         scanner.start(cameras[0]);
       } else {
-        console.error('No cameras found.');
+        console.error('Nenhuma câmera encontrada.');
       }
     }).catch(function (e) {
       console.error(e);
