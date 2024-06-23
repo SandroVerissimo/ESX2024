@@ -4,23 +4,41 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Scanner de QR Code</title>
-  <style>
-    #preview {
-      transform: scaleX(-1); /* Inverte horizontalmente o vídeo */
-    }
-  </style>
+  <link rel="stylesheet" href="style.css">
   <script src="https://rawgit.com/schmich/instascan-builds/master/instascan.min.js"></script>
 </head>
 <body>
   <h1>Leitor de QR Code</h1>
-  <video id="preview" playsinline autoplay></video>
+  <video id="preview"></video>
   <div id="output"></div>
 
   <script>
-    // Inicializa o scanner
+    // Inicializa o scanner com opções personalizadas
     let scanner = new Instascan.Scanner({ 
       video: document.getElementById('preview'),
-      mirror: false // Define como falso para não espelhar
+      mirror: true // Espelha o vídeo (opcional)
+    });
+
+    // Função para selecionar a câmera traseira
+    function useBackCamera() {
+      Instascan.Camera.getCameras().then(function (cameras) {
+        let backCamera = cameras.find(camera => camera.name.toLowerCase().includes('back'));
+        if (backCamera) {
+          scanner.stop(); // Para o scanner
+          scanner.start(backCamera); // Inicia o scanner com a câmera traseira
+        } else {
+          console.error('Câmera traseira não encontrada.');
+        }
+      }).catch(function (e) {
+        console.error(e);
+      });
+    }
+
+    // Adiciona um ouvinte de evento para selecionar a câmera traseira (opcional)
+    document.addEventListener('keydown', function (event) {
+      if (event.key === 'b' || event.key === 'B') {
+        useBackCamera();
+      }
     });
 
     // Adiciona um ouvinte de evento para processar o QR code lido
@@ -29,12 +47,13 @@
       // Aqui você pode fazer algo com o conteúdo lido do QR code
     });
 
-    // Inicializa o scanner com a primeira câmera encontrada
+    // Inicializa o scanner com a câmera traseira
     Instascan.Camera.getCameras().then(function (cameras) {
-      if (cameras.length > 0) {
-        scanner.start(cameras[0]);
+      let backCamera = cameras.find(camera => camera.name.toLowerCase().includes('back'));
+      if (backCamera) {
+        scanner.start(backCamera);
       } else {
-        console.error('Nenhuma câmera encontrada.');
+        console.error('Câmera traseira não encontrada.');
       }
     }).catch(function (e) {
       console.error(e);
@@ -42,5 +61,4 @@
   </script>
 </body>
 </html>
-
 
