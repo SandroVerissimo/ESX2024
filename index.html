@@ -32,23 +32,12 @@
 
     let qrCodes = []; // Array para armazenar os QR codes lidos
 
-    // Carrega os QR codes gravados anteriormente do localStorage (se existirem)
-    if (localStorage.getItem('qrCodes')) {
-      qrCodes = JSON.parse(localStorage.getItem('qrCodes'));
-      updateQrCodeList(); // Atualiza a lista na página
-    }
-
     // Adiciona um ouvinte de evento para processar o QR code lido
     scanner.addListener('scan', function (content) {
       // Verifica se o QR code já foi lido antes de adicioná-lo
       if (!qrCodes.includes(content)) {
         qrCodes.push(content); // Adiciona o QR code lido ao array
-
-        // Salva os QR codes no localStorage
-        localStorage.setItem('qrCodes', JSON.stringify(qrCodes));
-
-        // Atualiza a lista na página
-        updateQrCodeList();
+        updateQrCodeList(); // Atualiza a lista na página
       }
     });
 
@@ -79,6 +68,7 @@
   </script>
 </body>
 </html>
+
 
 
 
