@@ -3,12 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Scanner de QR Code</title>
+  <title>Leitor de QR Code</title>
   <style>
-    /* Estilos simples para a lista de QR codes */
+    /* Estilos para a lista de QR codes */
     #output-list {
       list-style-type: none;
       padding: 0;
+      margin-top: 20px;
     }
     #output-list li {
       margin-bottom: 5px;
@@ -16,95 +17,86 @@
       background-color: #f0f0f0;
       border: 1px solid #ccc;
     }
+    #output-list li::before {
+      content: "QR Code: ";
+      font-weight: bold;
+    }
+    #output-list li span {
+      font-style: italic;
+    }
   </style>
 </head>
 <body>
-  <!-- Título da página -->
   <h1>Leitor de QR Code</h1>
   
-  <!-- Elemento de vídeo para exibir a câmera -->
-  <video id="preview" playsinline autoplay></video>
+  <button onclick="startScan()">Iniciar Leitura de QR Code</button>
   
-  <!-- Lista para exibir os QR codes lidos -->
   <ul id="output-list"></ul>
+  
+  <button onclick="exportListToPNG()">Exportar Lista para PNG</button>
 
-  <!-- Botão para exportar QR codes -->
-  <button onclick="exportToPNG()">Exportar para PNG</button>
-
-  <!-- Scripts -->
-  <script src="https://cdn.jsdelivr.net/npm/html2canvas@0.4.1/dist/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/0.4.1/html2canvas.min.js"></script>
   <script src="https://rawgit.com/schmich/instascan-builds/master/instascan.min.js"></script>
   <script>
-    let scanner = new Instascan.Scanner({ 
-      video: document.getElementById('preview'),
-      mirror: false // Não espelha o vídeo (opcional)
-    });
+    let scanner = null;
+    let qrCodes = [];
 
-    let qrCodes = []; // Array para armazenar os QR codes lidos
-
-    // Adiciona um ouvinte de evento para processar o QR code lido
-    scanner.addListener('scan', function (content) {
-      // Verifica se o QR code já foi lido antes de adicioná-lo
-      if (!qrCodes.includes(content)) {
-        qrCodes.push(content); // Adiciona o QR code lido ao array
-        updateQrCodeList(); // Atualiza a lista na página
+    function startScan() {
+      // Verifica se o scanner já foi inicializado
+      if (scanner) {
+        scanner.start();
+        return;
       }
-    });
 
-    // Função para atualizar a lista de QR codes na página
+      scanner = new Instascan.Scanner({
+        video: document.getElementById('preview'),
+        mirror: false
+      });
+
+      scanner.addListener('scan', function (content) {
+        if (!qrCodes.includes(content)) {
+          qrCodes.push(content);
+          updateQrCodeList();
+        }
+      });
+
+      Instascan.Camera.getCameras().then(function (cameras) {
+        if (cameras.length > 0) {
+          scanner.start(cameras[0]); // Inicia o scanner com a primeira câmera disponível
+        } else {
+          console.error('Nenhuma câmera encontrada.');
+        }
+      }).catch(function (e) {
+        console.error(e);
+      });
+    }
+
     function updateQrCodeList() {
       let outputList = document.getElementById('output-list');
       outputList.innerHTML = ''; // Limpa a lista atual
 
-      // Itera sobre o array de QR codes e cria itens de lista para cada um
-      qrCodes.forEach(function (qrCode) {
+      qrCodes.forEach(function (qrCode, index) {
         let listItem = document.createElement('li');
-        listItem.textContent = qrCode;
+        listItem.textContent = `QR Code ${index + 1}: `;
+        let qrContent = document.createElement('span');
+        qrContent.textContent = qrCode;
+        listItem.appendChild(qrContent);
         outputList.appendChild(listItem);
       });
     }
 
-    // Função para exportar QR codes para PNG
-    function exportToPNG() {
-      // Criar uma tabela para os QR codes
-      let table = document.createElement('table');
-      let tbody = document.createElement('tbody');
-
-      // Iterar sobre os QR codes e adicionar linhas na tabela
-      qrCodes.forEach(function (qrCode) {
-        let row = document.createElement('tr');
-        let cell = document.createElement('td');
-        cell.textContent = qrCode;
-        row.appendChild(cell);
-        tbody.appendChild(row);
-      });
-
-      table.appendChild(tbody);
-
-      // Converter a tabela para uma imagem PNG
-      html2canvas(table).then(function(canvas) {
-        // Criar um link para download da imagem PNG
+    function exportListToPNG() {
+      html2canvas(document.getElementById('output-list')).then(function(canvas) {
         let link = document.createElement('a');
         link.href = canvas.toDataURL();
-        link.download = 'qrcodes.png';
+        link.download = 'qr_codes.png';
         link.click();
       });
     }
-
-    // Inicializa o scanner com a câmera traseira
-    Instascan.Camera.getCameras().then(function (cameras) {
-      let backCamera = cameras.find(camera => camera.name.toLowerCase().includes('back'));
-      if (backCamera) {
-        scanner.start(backCamera);
-      } else {
-        console.error('Câmera traseira não encontrada.');
-      }
-    }).catch(function (e) {
-      console.error(e);
-    });
   </script>
 </body>
 </html>
+
 
 
 
