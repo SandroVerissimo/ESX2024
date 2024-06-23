@@ -4,7 +4,6 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Scanner de QR Code</title>
-  <link rel="stylesheet" href="style.css">
   <style>
     /* Estilos simples para a lista de QR codes */
     #output-list {
@@ -18,8 +17,6 @@
       border: 1px solid #ccc;
     }
   </style>
-  <!-- Inclusão da biblioteca Instascan -->
-  <script src="https://rawgit.com/schmich/instascan-builds/master/instascan.min.js"></script>
 </head>
 <body>
   <!-- Título da página -->
@@ -34,7 +31,9 @@
   <!-- Botão para exportar QR codes -->
   <button onclick="exportToPNG()">Exportar para PNG</button>
 
-  <!-- Script JavaScript -->
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@0.4.1/dist/html2canvas.min.js"></script>
+  <script src="https://rawgit.com/schmich/instascan-builds/master/instascan.min.js"></script>
   <script>
     let scanner = new Instascan.Scanner({ 
       video: document.getElementById('preview'),
@@ -104,11 +103,9 @@
       console.error(e);
     });
   </script>
-
-  <!-- Incluir a biblioteca html2canvas para converter a tabela em PNG -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/0.4.1/html2canvas.min.js"></script>
 </body>
 </html>
+
 
 
 
