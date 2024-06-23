@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Leitor de QR Code</title>
+  <title>Leitor de QR Code com Captura Manual</title>
   <style>
     #video-container {
       display: flex;
@@ -17,19 +17,36 @@
       max-width: 500px;
       word-wrap: break-word;
     }
+    #captured-list {
+      margin-top: 20px;
+    }
+    .captured-item {
+      margin-bottom: 5px;
+      padding: 5px;
+      border: 1px solid #ccc;
+    }
   </style>
 </head>
 <body>
-  <h1>Leitor de QR Code</h1>
+  <h1>Leitor de QR Code com Captura Manual</h1>
   <div id="qr-result"></div>
   <div id="video-container">
     <video id="qr-video" width="300" height="300" autoplay></video>
+    <button onclick="captureQRCode()">Capturar QR Code</button>
+  </div>
+  <div id="captured-list">
+    <h2>QR Codes Capturados:</h2>
+    <ul id="captured-items">
+    </ul>
   </div>
 
   <script>
     const video = document.getElementById('qr-video');
     const qrResult = document.getElementById('qr-result');
+    const capturedItems = document.getElementById('captured-items');
+
     let scanning = false; // Estado de escaneamento
+    let lastCapturedCode = null; // Último código QR capturado
 
     // Função para inicializar o leitor de QR code
     function initQrCodeReader() {
@@ -59,9 +76,24 @@
       });
       if (code) {
         qrResult.textContent = 'QR Code encontrado: ' + code.data;
-        scanning = false; // Parar o escaneamento após encontrar um QR code
+        lastCapturedCode = code.data;
+      } else {
+        qrResult.textContent = 'Nenhum QR Code detectado.';
+        lastCapturedCode = null;
       }
       requestAnimationFrame(scan);
+    }
+
+    // Função para capturar manualmente o QR code detectado
+    function captureQRCode() {
+      if (lastCapturedCode) {
+        const li = document.createElement('li');
+        li.textContent = lastCapturedCode;
+        capturedItems.appendChild(li);
+        qrResult.textContent = 'QR Code capturado: ' + lastCapturedCode;
+      } else {
+        qrResult.textContent = 'Nenhum QR Code para capturar.';
+      }
     }
 
     // Iniciar o leitor quando a janela carregar
