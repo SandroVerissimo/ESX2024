@@ -1,5 +1,5 @@
-// Função para acessar a câmera traseira
-async function iniciarCameraTraseira() {
+// Função para iniciar a câmera e ler QR codes
+async function iniciarCameraQR() {
     try {
         // Obter todos os dispositivos de mídia
         const dispositivos = await navigator.mediaDevices.enumerateDevices();
@@ -24,6 +24,32 @@ async function iniciarCameraTraseira() {
             // Exibir o vídeo da câmera traseira no elemento de vídeo
             const video = document.getElementById('video');
             video.srcObject = stream;
+
+            // Configurar o leitor de QR code
+            const canvas = document.getElementById('canvas');
+            const context = canvas.getContext('2d');
+            const resultado = document.getElementById('resultado');
+
+            function verificarCodigoQR() {
+                canvas.width = video.videoWidth;
+                canvas.height = video.videoHeight;
+                context.drawImage(video, 0, 0, canvas.width, canvas.height);
+                const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+                const code = jsQR(imageData.data, imageData.width, imageData.height);
+                if (code) {
+                    resultado.textContent = 'QR Code detectado: ' + code.data;
+                } else {
+                    resultado.textContent = 'Nenhum QR Code detectado.';
+                }
+                requestAnimationFrame(verificarCodigoQR);
+            }
+
+            video.addEventListener('loadedmetadata', function() {
+                canvas.width = video.videoWidth;
+                canvas.height = video.videoHeight;
+                requestAnimationFrame(verificarCodigoQR);
+            });
+            
         } else {
             console.error('Câmera traseira não encontrada.');
         }
@@ -33,4 +59,5 @@ async function iniciarCameraTraseira() {
 }
 
 // Iniciar a câmera traseira ao carregar a página
-window.onload = iniciarCameraTraseira;
+window.onload = iniciarCameraQR;
+

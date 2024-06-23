@@ -3,11 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Câmera Traseira</title>
+    <title>Leitor QR Code</title>
 </head>
 <body>
-    <h1>Câmera Traseira</h1>
+    <h1>Leitor QR Code</h1>
     <video id="video" width="640" height="480" autoplay></video>
+    <canvas id="canvas" style="display: none;"></canvas>
+    <div id="resultado"></div>
+    <script src="https://cdn.jsdelivr.net/npm/jsqr@2.0.1/build/jsQR.js"></script>
     <script src="script.js"></script>
 </body>
 </html>
