@@ -18,12 +18,14 @@
       border: 1px solid #ccc;
     }
   </style>
+  <script src="https://cdn.jsdelivr.net/npm/qrious/dist/qrious.min.js"></script>
   <script src="https://rawgit.com/schmich/instascan-builds/master/instascan.min.js"></script>
 </head>
 <body>
   <h1>Leitor de QR Code</h1>
   <video id="preview" playsinline autoplay></video>
   <ul id="output-list"></ul> <!-- Lista para exibir os QR codes lidos -->
+  <button onclick="generateQrCodeImages()">Gerar Lista PNG</button> <!-- Botão para gerar lista PNG -->
 
   <script>
     // Cria um objeto Scanner Instascan com a configuração do vídeo e sem espelhamento
@@ -53,6 +55,36 @@
         let listItem = document.createElement('li');
         listItem.textContent = qrCode;
         outputList.appendChild(listItem);
+      });
+    }
+
+    // Função para gerar imagens PNG dos QR codes lidos
+    function generateQrCodeImages() {
+      qrCodes.forEach(function(qrCode, index) {
+        // Cria um elemento <canvas> temporário para renderizar o QR code
+        let canvas = document.createElement('canvas');
+        let context = canvas.getContext('2d');
+  
+        // Configura o tamanho do canvas
+        canvas.width = 200; // Largura
+        canvas.height = 200; // Altura
+  
+        // Cria um objeto QRious com o conteúdo do QR code atual
+        let qr = new QRious({
+          element: canvas,
+          value: qrCode,
+          size: 200 // Tamanho do QR code
+        });
+  
+        // Cria um link de download para o PNG do QR code
+        let link = document.createElement('a');
+        link.href = canvas.toDataURL('image/png'); // Converte o canvas para data URL PNG
+        link.download = `qr_code_${index + 1}.png`; // Nome do arquivo para download
+        link.textContent = `QR Code ${index + 1}`; // Texto do link
+  
+        // Adiciona o link à página
+        document.body.appendChild(link);
+        document.body.appendChild(document.createElement('br')); // Quebra de linha para separar os links
       });
     }
 
