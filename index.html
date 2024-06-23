@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Leitor de QR Code com Detecção de Proximidade</title>
+  <title>Leitor de QR Code</title>
   <style>
     #video-container {
       display: flex;
@@ -20,7 +20,7 @@
   </style>
 </head>
 <body>
-  <h1>Leitor de QR Code com Detecção de Proximidade</h1>
+  <h1>Leitor de QR Code</h1>
   <div id="qr-result"></div>
   <div id="video-container">
     <video id="qr-video" width="300" height="300" autoplay></video>
@@ -29,7 +29,6 @@
   <script>
     const video = document.getElementById('qr-video');
     const qrResult = document.getElementById('qr-result');
-    let lastCode = null; // Último código QR detectado
     let scanning = false; // Estado de escaneamento
 
     // Função para inicializar o leitor de QR code
@@ -38,6 +37,7 @@
         .then(function(stream) {
           video.srcObject = stream;
           video.play();
+          scanning = true;
           scan();
         })
         .catch(function(err) {
@@ -59,46 +59,15 @@
       });
       if (code) {
         qrResult.textContent = 'QR Code encontrado: ' + code.data;
-        lastCode = code.data;
-      } else {
-        qrResult.textContent = 'Nenhum QR Code detectado.';
-        lastCode = null;
+        scanning = false; // Parar o escaneamento após encontrar um QR code
       }
       requestAnimationFrame(scan);
     }
 
-    // Iniciar escaneamento quando a janela carregar
+    // Iniciar o leitor quando a janela carregar
     window.addEventListener('load', function() {
       initQrCodeReader();
-      // Iniciar a detecção de proximidade
-      startProximityDetection();
     });
-
-    // Função para detectar proximidade
-    function startProximityDetection() {
-      const proximityThreshold = 100; // Threshold de proximidade em pixels
-
-      setInterval(function() {
-        if (lastCode) {
-          const bounds = video.getBoundingClientRect();
-          const centerX = bounds.left + bounds.width / 2;
-          const centerY = bounds.top + bounds.height / 2;
-          const codeX = bounds.left + (lastCode.location.topRightCorner.x + lastCode.location.bottomLeftCorner.x) / 2;
-          const codeY = bounds.top + (lastCode.location.topRightCorner.y + lastCode.location.bottomLeftCorner.y) / 2;
-          const distance = Math.sqrt(Math.pow(centerX - codeX, 2) + Math.pow(centerY - codeY, 2));
-          
-          if (distance <= proximityThreshold) {
-            // QR code está próximo
-            qrResult.textContent = 'QR Code está próximo: ' + lastCode;
-          } else {
-            // QR code não está mais próximo
-            qrResult.textContent = 'QR Code detectado, mas não está próximo.';
-          }
-        } else {
-          qrResult.textContent = 'Nenhum QR Code detectado.';
-        }
-      }, 500); // Verificar a proximidade a cada 500ms
-    }
   </script>
 </body>
 </html>
