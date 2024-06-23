@@ -18,15 +18,24 @@
       border: 1px solid #ccc;
     }
   </style>
-    <script src="https://rawgit.com/schmich/instascan-builds/master/instascan.min.js"></script>
+  <!-- Inclusão da biblioteca Instascan -->
+  <script src="https://rawgit.com/schmich/instascan-builds/master/instascan.min.js"></script>
 </head>
 <body>
+  <!-- Título da página -->
   <h1>Leitor de QR Code</h1>
+  
+  <!-- Elemento de vídeo para exibir a câmera -->
   <video id="preview" playsinline autoplay></video>
-  <ul id="output-list"></ul> <!-- Lista para exibir os QR codes lidos -->
+  
+  <!-- Lista para exibir os QR codes lidos -->
+  <ul id="output-list"></ul>
 
+  <!-- Botão para exportar QR codes -->
+  <button onclick="exportToPNG()">Exportar para PNG</button>
+
+  <!-- Script JavaScript -->
   <script>
-
     let scanner = new Instascan.Scanner({ 
       video: document.getElementById('preview'),
       mirror: false // Não espelha o vídeo (opcional)
@@ -56,6 +65,33 @@
       });
     }
 
+    // Função para exportar QR codes para PNG
+    function exportToPNG() {
+      // Criar uma tabela para os QR codes
+      let table = document.createElement('table');
+      let tbody = document.createElement('tbody');
+
+      // Iterar sobre os QR codes e adicionar linhas na tabela
+      qrCodes.forEach(function (qrCode) {
+        let row = document.createElement('tr');
+        let cell = document.createElement('td');
+        cell.textContent = qrCode;
+        row.appendChild(cell);
+        tbody.appendChild(row);
+      });
+
+      table.appendChild(tbody);
+
+      // Converter a tabela para uma imagem PNG
+      html2canvas(table).then(function(canvas) {
+        // Criar um link para download da imagem PNG
+        let link = document.createElement('a');
+        link.href = canvas.toDataURL();
+        link.download = 'qrcodes.png';
+        link.click();
+      });
+    }
+
     // Inicializa o scanner com a câmera traseira
     Instascan.Camera.getCameras().then(function (cameras) {
       let backCamera = cameras.find(camera => camera.name.toLowerCase().includes('back'));
@@ -68,8 +104,12 @@
       console.error(e);
     });
   </script>
+
+  <!-- Incluir a biblioteca html2canvas para converter a tabela em PNG -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/0.4.1/html2canvas.min.js"></script>
 </body>
 </html>
+
 
 
 
