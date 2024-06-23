@@ -1,3 +1,6 @@
+// Variável global para armazenar os QR codes lidos
+let qrCodesLidos = [];
+
 // Função para iniciar a câmera e ler QR codes
 async function iniciarCameraQR() {
     try {
@@ -29,6 +32,7 @@ async function iniciarCameraQR() {
             const canvas = document.getElementById('canvas');
             const context = canvas.getContext('2d');
             const resultado = document.getElementById('resultado');
+            const listaQRCodes = document.getElementById('listaQRCodes');
 
             function verificarCodigoQR() {
                 canvas.width = video.videoWidth;
@@ -37,7 +41,16 @@ async function iniciarCameraQR() {
                 const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
                 const code = jsQR(imageData.data, imageData.width, imageData.height);
                 if (code) {
-                    resultado.textContent = 'QR Code detectado: ' + code.data;
+                    if (!qrCodesLidos.includes(code.data)) {
+                        qrCodesLidos.push(code.data);
+                        resultado.textContent = 'QR Code detectado: ' + code.data;
+                        // Adicionar QR code à lista
+                        const listItem = document.createElement('li');
+                        listItem.textContent = code.data;
+                        listaQRCodes.appendChild(listItem);
+                    } else {
+                        resultado.textContent = 'QR Code já foi lido: ' + code.data;
+                    }
                 } else {
                     resultado.textContent = 'Nenhum QR Code detectado.';
                 }
@@ -60,4 +73,5 @@ async function iniciarCameraQR() {
 
 // Iniciar a câmera traseira ao carregar a página
 window.onload = iniciarCameraQR;
+
 
